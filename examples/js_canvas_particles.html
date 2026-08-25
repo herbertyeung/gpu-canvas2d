@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <body>
+    <canvas id="c" width="960" height="540"></canvas>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const particles = [];
+      const colors = ["#9cff38", "#ffe739", "#ff8129", "#29d9ff"];
+
+      function spawn() {
+        const angle = Math.random() * Math.PI * 2;
+        particles.push({
+          x: canvas.width * 0.5 + (Math.random() - 0.5) * 30,
+          y: canvas.height * 0.58 + (Math.random() - 0.5) * 30,
+          vx: Math.cos(angle) * (0.35 + Math.random() * 1.5),
+          vy: Math.sin(angle) * (0.35 + Math.random() * 1.5),
+          life: 80 + Math.random() * 180,
+          age: 0,
+          radius: 5 + Math.random() * 15,
+          color: colors[(Math.random() * colors.length) | 0]
+        });
+      }
+
+      function hexagon(p, time) {
+        const pulse = 1 + Math.sin(time * 0.004 + p.age * 0.08) * 0.15;
+        ctx.beginPath();
+        for (let side = 0; side < 6; ++side) {
+          const angle = side * Math.PI / 3;
+          const x = p.x + Math.cos(angle) * p.radius * pulse;
+          const y = p.y + Math.sin(angle) * p.radius * pulse;
+          if (side === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 1.2 + 2.5 * (1 - p.age / p.life);
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 14;
+        ctx.stroke();
+      }
+
+      function frame(time) {
+        ctx.globalCompositeOperation = "source-over";
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "rgba(0, 0, 5, 0.10)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.globalCompositeOperation = "lighter";
+        if (particles.length < 64) spawn();
+        for (let i = particles.length - 1; i >= 0; --i) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vx *= 0.997;
+          p.vy *= 0.997;
+          ++p.age;
+          hexagon(p, time);
+          if (p.age >= p.life) particles.splice(i, 1);
+        }
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    </script>
+  </body>
+</html>

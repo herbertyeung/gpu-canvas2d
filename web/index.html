@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="GPU Canvas 2D is a compact browser-style Canvas runtime in C++ with QuickJS-ng, Skia Ganesh, and Direct3D 12 renderers.">
+  <meta name="theme-color" content="#e9eef2">
+  <title>GPU Canvas 2D — Canvas commands, native GPU execution</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#playground">Skip to live playground</a>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="GPU Canvas 2D home">
+      <span class="brand-mark" aria-hidden="true">C2D</span>
+      <span>GPU Canvas 2D</span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="#playground">Playground</a>
+      <a href="#native-app">Native app</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#build">Build</a>
+    </nav>
+    <a class="source-link" href="https://github.com/herbertyeung/gpu-canvas2d">View source <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">C++20 · QuickJS-ng · Skia Ganesh · Direct3D 12</p>
+        <h1 id="hero-title">Canvas commands.<br><span>Native GPU execution.</span></h1>
+        <p class="hero-summary">
+          A compact HTML Canvas 2D runtime for Windows. It executes JavaScript, records Canvas
+          operations, and routes each frame through switchable native renderer plugins.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#playground">Run the Canvas demo</a>
+          <a class="button secondary" href="#native-app">See the native application</a>
+        </div>
+      </div>
+
+      <aside class="route-card" aria-label="Native frame route">
+        <div class="route-card-head">
+          <span>Native frame route</span>
+          <span class="hardware-status"><i></i> GPU</span>
+        </div>
+        <ol class="route-list">
+          <li><span>01</span><strong>JavaScript</strong><small>QuickJS-ng runtime</small></li>
+          <li><span>02</span><strong>CanvasFrame</strong><small>recorded operations</small></li>
+          <li><span>03</span><strong>Renderer ABI</strong><small>runtime DLL selection</small></li>
+          <li class="route-choice">
+            <span>04</span>
+            <strong>Skia Ganesh</strong>
+            <small>D3D12 GPU surface</small>
+            <b>or</b>
+            <strong>Native D3D12</strong>
+            <small>instances and batches</small>
+          </li>
+          <li><span>05</span><strong>Swap chain</strong><small>presented frame</small></li>
+        </ol>
+      </aside>
+    </section>
+
+    <section class="section playground-section" id="playground" aria-labelledby="playground-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">Live browser playground</p>
+          <h2 id="playground-title">Edit the page. Run the frame.</h2>
+        </div>
+        <p>
+          This preview runs standard Canvas 2D inside your browser. The native desktop application
+          executes the same style of page through QuickJS-ng and its renderer plugins.
+        </p>
+      </div>
+
+      <div class="workbench">
+        <div class="workbench-rail" aria-hidden="true">
+          <span>HTML</span><span>JS</span><span>2D</span><span>RAF</span>
+        </div>
+
+        <section class="editor-pane" aria-label="Editable HTML and JavaScript">
+          <div class="pane-toolbar">
+            <div class="file-tab"><span aria-hidden="true"></span> scene.html</div>
+            <div class="editor-actions">
+              <button type="button" class="tool-button" id="reset-button">Reset</button>
+              <button type="button" class="tool-button run-button" id="run-button">
+                Run <kbd>Ctrl</kbd><kbd>Enter</kbd>
+              </button>
+            </div>
+          </div>
+          <label class="visually-hidden" for="source-editor">Editable HTML and JavaScript source</label>
+          <textarea id="source-editor" class="source-editor" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+          <div class="pane-footer">
+            <span id="line-count">0 lines</span>
+            <span>editable source</span>
+          </div>
+        </section>
+
+        <section class="preview-pane" aria-label="Live Canvas result">
+          <div class="pane-toolbar preview-toolbar">
+            <div class="preview-title">
+              <span class="live-indicator" aria-hidden="true"></span>
+              Browser Canvas 2D
+            </div>
+            <span class="sandbox-label">sandboxed iframe</span>
+          </div>
+          <iframe
+            id="canvas-preview"
+            class="canvas-preview"
+            title="Live result of the editable Canvas page"
+            sandbox="allow-scripts"
+          ></iframe>
+          <div class="pane-footer preview-status" aria-live="polite">
+            <span id="preview-status" data-state="idle">Waiting to run</span>
+            <span>not the native backend</span>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="section native-section" id="native-app" aria-labelledby="native-title">
+      <div class="section-heading native-heading">
+        <div>
+          <p class="section-label">Actual Windows application</p>
+          <h2 id="native-title">The native path, running on Skia Ganesh D3D12.</h2>
+        </div>
+        <p>
+          The application hosts an editable HTML/JavaScript page on the left and a GPU-backed
+          Canvas surface on the right. Renderer plugins can be switched while the program runs.
+        </p>
+      </div>
+
+      <figure class="application-shot">
+        <div class="shot-bar">
+          <span>CAPTURE / SKIA GANESH D3D12 GPU</span>
+          <span>CANVAS 960 × 540</span>
+        </div>
+        <img
+          src="./assets/gpu-canvas2d-app.png"
+          width="1651"
+          height="995"
+          alt="GPU Canvas 2D Windows application with editable JavaScript on the left and a long-shadow Canvas animation rendered by Skia Ganesh D3D12 on the right"
+          loading="lazy"
+        >
+        <figcaption>
+          Real application capture. The right pane is a native GPU-backed SkSurface; it is not a
+          browser screenshot or a pre-rendered mockup.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="section pipeline-section" id="pipeline" aria-labelledby="pipeline-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-label">Rendering pipeline</p>
+          <h2 id="pipeline-title">One page, two native backends.</h2>
+        </div>
+        <p>
+          The executable owns the editor, JavaScript runtime, and frame loop. Rendering code stays
+          behind a versioned C ABI and is discovered from DLLs at startup.
+        </p>
+      </div>
+
+      <ol class="pipeline" aria-label="GPU Canvas 2D rendering stages">
+        <li>
+          <span>Input</span>
+          <strong>HTML + JavaScript</strong>
+          <small>editable page source</small>
+        </li>
+        <li>
+          <span>Runtime</span>
+          <strong>QuickJS-ng</strong>
+          <small>Canvas and RAF bindings</small>
+        </li>
+        <li>
+          <span>Record</span>
+          <strong>CanvasFrame</strong>
+          <small>ordered draw operations</small>
+        </li>
+        <li>
+          <span>Boundary</span>
+          <strong>Plugin ABI v4</strong>
+          <small>runtime renderer switch</small>
+        </li>
+        <li class="pipeline-branch">
+          <span>GPU</span>
+          <strong>Skia / D3D12</strong>
+          <small>surface or native batches</small>
+        </li>
+        <li>
+          <span>Output</span>
+          <strong>Swap chain</strong>
+          <small>presented pixels</small>
+        </li>
+      </ol>
+    </section>
+
+    <section class="section engineering-section" aria-labelledby="engineering-title">
+      <div class="section-heading compact-heading">
+        <div>
+          <p class="section-label">Engineering notes</p>
+          <h2 id="engineering-title">Small enough to trace. Real enough to measure.</h2>
+        </div>
+      </div>
+
+      <div class="engineering-grid">
+        <article>
+          <span class="detail-tag">01 / Page lifecycle</span>
+          <h3>Last valid frame stays visible</h3>
+          <p>A syntax or runtime error does not replace the running page. Valid edits take effect immediately.</p>
+        </article>
+        <article>
+          <span class="detail-tag">02 / GPU surface</span>
+          <h3>No per-frame readback</h3>
+          <p>Ganesh and the compositor share the D3D12 device, queue, adapter, and texture.</p>
+        </article>
+        <article>
+          <span class="detail-tag">03 / Renderer boundary</span>
+          <h3>Backends are runtime DLLs</h3>
+          <p>The host discovers renderer plugins at startup and can reload or switch them while running.</p>
+        </article>
+        <article>
+          <span class="detail-tag">04 / Native D3D12</span>
+          <h3>Commands become batches</h3>
+          <p>The direct backend exposes instance uploads, pipeline state, barriers, fences, and presentation.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section build-section" id="build" aria-labelledby="build-title">
+      <div class="build-copy">
+        <p class="section-label">Build it locally</p>
+        <h2 id="build-title">CMake restores the rendering stack.</h2>
+        <p>
+          The vcpkg manifest pins the tested dependency baseline and enables Skia's Direct3D
+          feature. A hardware D3D12 adapter is required; the renderer does not silently fall back
+          to WARP.
+        </p>
+        <a class="text-link" href="https://github.com/herbertyeung/gpu-canvas2d#build">Full build notes <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="command-card" aria-label="Build commands">
+        <div class="command-head">
+          <span>PowerShell</span>
+          <span>Windows x64</span>
+        </div>
+        <pre><code><span class="prompt">$</span> <span class="command">$env:VCPKG_ROOT</span> = 'C:&#92;path&#92;to&#92;vcpkg'
+<span class="prompt">$</span> cmake --preset default
+<span class="prompt">$</span> cmake --build --preset release -- /m</code></pre>
+      </div>
+    </section>
+
+    <section class="limits">
+      <p class="section-label">Deliberate boundary</p>
+      <p>
+        This is a Canvas runtime and rendering demo, not a complete browser. It does not implement
+        general DOM layout, full CSS, networking, modules, workers, image loading, text rendering,
+        WebGL, or the web security model.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>GPU Canvas 2D</strong>
+      <span>Designed and built by Hongtao Yang</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/herbertyeung">GitHub profile</a>
+      <a href="https://github.com/herbertyeung/gpu-canvas2d">Source repository</a>
+      <span>MIT License</span>
+    </div>
+  </footer>
+
+  <script src="./playground.js"></script>
+</body>
+</html>
